@@ -95,6 +95,19 @@ For Linux (Ubuntu or other Debian based), just use `apt install`:
 
 For anything else, follow the [official instructions](https://docs.docker.com/install/).
 
+### Manage docker as a non-root user
+
+In Linux, if you don't want to use `sudo` in the front of every `docker` or
+`docker-compose` command below, you need to add a `docker` group and assign
+yourself to it.  You can follow the [official instructions](https://docs.docker.com/install/linux/linux-postinstall/).
+
+For the IoThon Ubuntu VM, do the following:
+```sh
+   sudo usermod -aG docker iothon
+```
+
+Log out from your SSH session (or terminal) and log in again (or open new terminal).
+
 ### Running Mosquitto + InfluxDB + Grafana in docker, in your *server*
 
 Set the `DATA_DIR` environment variable to the path where will be stored local data, e.g. `/tmp`
@@ -128,37 +141,27 @@ they are nicely up and running with
    docker ps
 ```
 
-To shut down your server, e.g. if you need to change the settings, run
+You should see all the four containers running continuously, and not restarting.
+If any of them is restarting, you can use `docker logs `_container_ to see its
+logs, or `docker exec -it _container_ sh` to run a shell in the container.
+
+To shut down your containers, e.g. if you need to change the settings, run
 ```sh
    docker-compose down
 ```
 
-The Mosquitto username and passwords are `mqttuser` and `mqttpassword`.
-To change these, see the `Optional: Update mosquitto credentials` section below.
-
 You can now test your Granafa at http://<your-host-ip>:3000.  See below how to
 log in to and configure Grafana, and how to get the data flowing.
 
-## Programming the sensor(s) with your *laptop*
-
-For programming your sensors, the easiest way is to use the
-[Arduino IDE](https://www.arduino.cc/en/Main/Software).  If you
-are more experienced, you can also [use GCC and a flasher directly](TBD).
-
-Sensors should send data to the mosquitto broker to the following MQTT topic:
-`home/{peripheralName}/{sensorname}`.
-For example: `home/mkrnb1500/temperature`.
-
-Arduino sketches for the MKR NB 1500 are provided to in `03-arduino_mqtt`.
-Before flashing, you need to change the `MQTT_SERVER` constant to MQTT *server* IP address.
-
-For using any interesting sensors, you will need to modify the sketch to
-use a suitable sensor driver to fetch the data from the sensor and to pass
-it via MQTT to your server.
+The Mosquitto username and passwords are `mqttuser` and `mqttpassword`.
+To change these, see the `Optional: Update mosquitto credentials` section below.
 
 ## Grafana setup
 
-
+It is a good idea to log in your Grafana right away and change your
+`admin` password.  You can also add an InfluxDB data source already now,
+or later.  For having a meaningful Dashboard, you must first get some
+data to your InfluxDB database.
 
 - Access Grafana from `http://<host ip>:3000`
 - Log in with user/password `admin/admin`
@@ -182,6 +185,23 @@ it via MQTT to your server.
   - Left Y
     - Unit: Temperature > Celcius
   - Panel title: Temperature (°C)
+
+## Programming the sensor(s) with your *laptop*
+
+For programming your sensors, the easiest way is to use the
+[Arduino IDE](https://www.arduino.cc/en/Main/Software).  If you
+are more experienced, you can also [use GCC and a flasher directly](TBD).
+
+Sensors should send data to the mosquitto broker to the following MQTT topic:
+`home/{peripheralName}/{sensorname}`.
+For example: `home/mkrnb1500/temperature`.
+
+Arduino sketches for the MKR NB 1500 are provided to in `03-arduino_mqtt`.
+Before flashing, you need to change the `MQTT_SERVER` constant to MQTT *server* IP address.
+
+For using any interesting sensors, you will need to modify the sketch to
+use a suitable sensor driver to fetch the data from the sensor and to pass
+it via MQTT to your server.
 
 
 ## Optional: Update mosquitto credentials
