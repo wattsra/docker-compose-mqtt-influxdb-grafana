@@ -196,7 +196,7 @@ Sensors should send data to the mosquitto broker to the following MQTT topic:
 For example: `home/mkrnb1500/temperature`.
 
 Arduino sketches for the MKR NB 1500 are provided to in `03-arduino_mqtt`.
-See the `README.md` [file there](03-arduino_mqtt/README.md):
+See the `README.md` [file there](03-arduino_mqtt/README.md).
 
 Before flashing, you need to change the `MQTT_SERVER` constant to MQTT *server* IP address.
 
