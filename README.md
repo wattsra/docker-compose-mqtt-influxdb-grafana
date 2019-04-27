@@ -29,17 +29,18 @@ If you want to, you can also run everything on a single machine.
 **NOTE** that your *server* must have a public IP address for being
 able to receive MQTT data over the NB-IoT network from your Arduino.
 You should have this IP address handly, since you will need to know it
-below.
+below.  If you are using an IoThon VM, you have received the IP
+address when you signed for your VM information.
 
 ## A security note
 
-**NOTE** that these instructions do not explain how to secure your
+Note that these instructions do not explain how to secure your
 MQTT or other communication with your server, e.g., with TLS.  If you
 want to use TLS, see e.g. this
 [Dev Side Story](https://devsidestory.com/lets-encrypt-with-docker/)
 for running a TLS front end on your server side.
-For your Arduino, you may want to adapt from the instructions for securely
-[connecting to Azure](https://create.arduino.cc/projecthub/Arduino_Genuino/securely-connecting-an-arduino-nb-1500-to-azure-iot-hub-af6470).
+For your Arduino, you may want to adapt from the
+[instructions for securely connecting to Azure](https://create.arduino.cc/projecthub/Arduino_Genuino/securely-connecting-an-arduino-nb-1500-to-azure-iot-hub-af6470).
 
 ## Subfolders
 
@@ -208,7 +209,30 @@ it via MQTT to your server.
 
 ## Testing MQTT without a sensor
 
+If you want to test your server setup without your sensors, e.g. to make sure
+that your server works while you are debugging your sensor, we recommend
+[MQTT.FX](http://mqttfx.org).  Install the latest version, click the
+gear wheel icon to add a Connection Profile for your Mosquitto server,
+and publish some data on a topic, as explained above.
 
+For your Connection Profile, you can use the following data:
+```
+   Profile Name      whatever you like
+   Profile Type      MQTT Broker
+   Broker Address    your server ip
+   Broker Port       1883
+   Client ID         whatever you like
+   User Name         mqttuser     # or as changed, see below
+   Password          mqttpassword # or as changed, see below
+```
+
+To see that your server works, the easiest way is to inspect your
+MQTT bridge logs:
+```sh
+   docker logs mqttbridge
+```
+
+To enter some data, Connect, and Publish, e.g. at `home/testing/temperature`.
 
 ## Optional: Update mosquitto credentials
 
