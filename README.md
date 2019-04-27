@@ -22,13 +22,14 @@ approach using two computers:
    and Grafana data visualisation.
 
 Of course, you don't need to have a laptop, but may instead have a
-Raspberry Pi or similar machine, used to program the Arduino.  However,
+Raspberry Pi or similar, used to program the Arduino.  However,
 we call that machine as a _laptop_ in these instructions.
 If you want to, you can also run everything on a single machine.
 
-**NOTE** that your *server* must have a public IP address for being able
-to receive MQTT data from your Arduino.  You should have this IP address
-handly, since you will know it below.
+**NOTE** that your *server* must have a public IP address for being
+able to receive MQTT data over the NB-IoT network from your Arduino.
+You should have this IP address handly, since you will need to know it
+below.
 
 ## A security note
 
@@ -189,7 +190,8 @@ data to your InfluxDB database.
 
 For programming your sensors, the easiest way is to use the
 [Arduino IDE](https://www.arduino.cc/en/Main/Software).  If you
-are more experienced, you can also [use GCC and a flasher directly](TBD).
+are more experienced, you can also
+[use GCC and a flasher directly](03-arduino_mqtt/Using-GCC.md).
 
 Sensors should send data to the mosquitto broker to the following MQTT topic:
 `home/{peripheralName}/{sensorname}`.
