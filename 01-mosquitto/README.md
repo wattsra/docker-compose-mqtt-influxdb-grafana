@@ -24,7 +24,7 @@ Two docker volumes have been created in the image to be used for persistent stor
 When creating a container from the image, the default configuration values are used.
 To use a custom configuration file, mount a **local** configuration file to `/mosquitto/config/mosquitto.conf`
 ```sh
-$ docker run -it -p 1883:1883 -v <absolute-path-to-configuration-file>:/mosquitto/config/mosquitto.conf nilhcem/mosquitto
+   docker run -it -p 1883:1883 -v <absolute-path-to-configuration-file>:/mosquitto/config/mosquitto.conf iothon/mosquitto
 ```
 
 ### Persistence

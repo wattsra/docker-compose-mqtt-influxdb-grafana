@@ -3,19 +3,19 @@
 ## Build
 
 ```sh
-$ docker build -t nilhcem/mqttbridge .
+   docker build -t iothon/mqttbridge .
 ```
 
 
 ## Run
 
 ```sh
-$ docker run -d --name mqttbridge nilhcem/mqttbridge
+   docker run -d --name mqttbridge iothon/mqttbridge
 ```
 
 
 ## Dev
 
 ```sh
-$ docker run -it --rm -v `pwd`:/app --name python python:3.7-alpine sh
+   docker run -it --rm -v `pwd`:/app --name python python:3.7-alpine sh
 ```
