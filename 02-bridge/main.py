@@ -12,6 +12,8 @@ from typing import NamedTuple
 import paho.mqtt.client as mqtt
 from influxdb import InfluxDBClient
 
+import time
+
 INFLUXDB_ADDRESS = 'influxdb'
 INFLUXDB_USER = 'root'
 INFLUXDB_PASSWORD = 'root'
@@ -82,6 +84,9 @@ def _init_influxdb_database():
 
 
 def main():
+    time.sleep(10)
+
+    print('Connecting to the database.')
     _init_influxdb_database()
 
     mqtt_client = mqtt.Client(MQTT_CLIENT_ID)
