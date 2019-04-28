@@ -1,105 +1,94 @@
 /**
+
+    XXX
+
     Required libraries:
-      - Adafruit BME280 Library
-      - Adafruit Unified Sensor
+      - MKRNB
       - PubSubClient
 **/
 
-#include <Wire.h>
-#include <SPI.h>
-#include <Adafruit_Sensor.h>
-#include <Adafruit_BME280.h>
-#include <ESP8266WiFi.h>
+// #include <Adafruit_Sensor.h>
+// #include <Adafruit_BME280.h>
+
+#include <MKRNB.h>
 #include <PubSubClient.h>
 
-#define MQTT_TOPIC_HUMIDITY "home/bme280/humidity"
-#define MQTT_TOPIC_TEMPERATURE "home/bme280/temperature"
-#define MQTT_TOPIC_STATE "home/bme280/status"
-#define MQTT_PUBLISH_DELAY 60000
-#define MQTT_CLIENT_ID "esp8266bme280"
+// If you are not using the default PIN, consider using "arduino_secrets.h"
+// See https://www.hackster.io/Arduino_Genuino/store-your-sensitive-data-safely-when-sharing-a-sketch-e7d0f0
+const char PIN_NUMBER[] = "1234";
+const char APN[] = "internet";
 
-#define BME280_ADDRESS 0x76
+#define MQTT_TOPIC_TEMPERATURE "home/iothon/temperature"
+#define MQTT_TOPIC_STATE       "home/iothon/status"
+#define MQTT_PUBLISH_DELAY     60000 // 60 seconds
+#define MQTT_CLIENT_ID         "mkrnb1500iothon"
 
-const char *WIFI_SSID = "your-ssid";
-const char *WIFI_PASSWORD = "your-password";
-
-const char *MQTT_SERVER = "homeserver";
-const char *MQTT_USER = "mqttuser"; // NULL for no authentication
+const char *MQTT_SERVER   = "195.148.126.xx"; // XXX change to your server IP
+const char *MQTT_USER     = "mqttuser";     // NULL for no authentication
 const char *MQTT_PASSWORD = "mqttpassword"; // NULL for no authentication
 
-float humidity;
-float temperature;
-long lastMsgTime = 0;
-
-Adafruit_BME280 bme;
-WiFiClient espClient;
-PubSubClient mqttClient(espClient);
+NB           nbAccess(true); // NB access: include a 'true' parameter for debug enabled
+GPRS         gprsAccess;     // GPRS access
+NBClient     tcpSocket;
+PubSubClient mqttClient(tcpSocket);
 
 void setup() {
   Serial.begin(115200);
-  while (! Serial);
+  while (! Serial)
+      ;
 
-  if (!bme.begin(BME280_ADDRESS)) {
-    Serial.println("Could not find a valid BME280 sensor, check wiring or BME-280 address!");
-    while (1);
+  Serial.println("MKR NB 1500 MQTT client starting.");
+
+  Serial.print("Connecting to the NB-IoT / LTE Cat M1 network...");
+  while (nbAccess.begin(PIN_NUMBER, APN) != NB_READY) {
+    Serial.println("failed.  Retrying in 10 seconds.");
+    delay(10000);
   }
+  Serial.println("connected.");
 
-  // Use force mode so that the sensor returns to sleep mode when the measurement is finished
-  bme.setSampling(Adafruit_BME280::MODE_FORCED,
-                  Adafruit_BME280::SAMPLING_X1, // temperature
-                  Adafruit_BME280::SAMPLING_NONE, // pressure
-                  Adafruit_BME280::SAMPLING_X1, // humidity
-                  Adafruit_BME280::FILTER_OFF);
+  Serial.print("Acquiring a PDP context...");
+  while (gprsAccess.attachGPRS() != GPRS_READY) {
+    Serial.println("failed.  Retrying in 10 seconds.");
+    delay(10000);
+  }
+  Serial.println("acquired.");
 
-  setupWifi();
   mqttClient.setServer(MQTT_SERVER, 1883);
 }
 
 void loop() {
-  if (!mqttClient.connected()) {
-    mqttReconnect();
-  }
+  mqttConnectIfNeeded();
   mqttClient.loop();
+
+  long lastMsgTime = 0;
 
   long now = millis();
   if (now - lastMsgTime > MQTT_PUBLISH_DELAY) {
     lastMsgTime = now;
 
-    // Reading BME280 sensor data
-    bme.takeForcedMeasurement(); // has no effect in normal mode
-    humidity = bme.readHumidity();
-    temperature = bme.readTemperature();
-    if (isnan(humidity) || isnan(temperature)) {
-      Serial.println("BME280 reading issues");
-      return;
-    }
-
-    // Publishing sensor data
+    float temperature = readTemperature();
     mqttPublish(MQTT_TOPIC_TEMPERATURE, temperature);
-    mqttPublish(MQTT_TOPIC_HUMIDITY, humidity);
   }
 }
 
-void setupWifi() {
-  Serial.print("Connecting to ");
-  Serial.println(WIFI_SSID);
+float readTemperature() {
+  String temp;
 
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  // Read the NB-IoT modem's internal temperature
 
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
+  MODEM.send("AT+UTEMP?");
+  MODEM.waitForResponse(100, &temp);
+
+  if (temp.startsWith("+UTEMP: ")) {
+    temp.remove(0, 8);
+    return temp.toFloat();
   }
-
-  Serial.println();
-  Serial.println("WiFi connected");
-  Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());
+  return NAN;
 }
 
-void mqttReconnect() {
+void mqttConnectIfNeeded() {
   while (!mqttClient.connected()) {
-    Serial.print("Attempting MQTT connection...");
+    Serial.print("Connceting to the MQTT...");
 
     // Attempt to connect
     if (mqttClient.connect(MQTT_CLIENT_ID, MQTT_USER, MQTT_PASSWORD, MQTT_TOPIC_STATE, 1, true, "disconnected", false)) {
@@ -108,18 +97,19 @@ void mqttReconnect() {
       // Once connected, publish an announcement...
       mqttClient.publish(MQTT_TOPIC_STATE, "connected", true);
     } else {
-      Serial.print("failed, rc=");
+      Serial.print("failed, state=");
       Serial.print(mqttClient.state());
-      Serial.println(" try again in 5 seconds");
+      Serial.println(". Trying again in 5 seconds.");
       delay(5000);
     }
   }
 }
 
-void mqttPublish(char *topic, float payload) {
+void mqttPublish(String topic, float payload) {
+  Serial.print("Publishing at ");
   Serial.print(topic);
   Serial.print(": ");
   Serial.println(payload);
 
-  mqttClient.publish(topic, String(payload).c_str(), true);
+  mqttClient.publish(topic.c_str(), String(payload).c_str(), true);
 }
