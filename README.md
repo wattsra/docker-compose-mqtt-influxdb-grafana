@@ -118,6 +118,8 @@ something else.
 ```sh
    export DATA_DIR=/tmp
 ```
+(Note: For Mac OS X with Docker for Desktop, use `export DATA_DIR=/private/tmp` instead,
+as docker has problems in understanding that `/tmp` is a symbolic link.)
 
 Create data directories, with write access for the Mosquitto and Grafana containers:
 
@@ -249,3 +251,26 @@ To change default MQTT username and password, run the following, replacing `<USE
 
 Then, update the `MQTT_USER` and `MQTT_PASSWORD` constants in all the subdirectories, and launch docker compose again.
 
+## Definition of done
+
+Once you have your cloud and sensor communicating, you should see the
+(fake) temperature and/or RSSI data getting entered into your InfludDB
+by the `mqttbridge`, as can be verified with `docker logs mqttbridge`.
+For visualising it, see the [Grafana](#Grafana_setup) instructions above.
+
+Once you have your data being visualised, you are on your own to innovate.
+
+## Next steps
+
+For hints what you can do with the Arduino, see the
+[README](03-arduino_mqtt/README.md) for the MKR NB 1500 sketch.
+
+For the cloud, you are more or less on our own.  Good starting
+points for potentially problematic parts are the following:
+* [Docker networking tutorial video](https://blog.docker.com/2015/04/docker-tutorial-5-basic-networking/)
+* [Docker networking with standalone containers](https://docs.docker.com/network/network-tutorial-standalone/)
+* [Docker networking in Compose](https://docs.docker.com/compose/networking/)
+
+The [Docker compose script](/iothon/docker-compose-mqtt-influxdb-grafana/blob/master/00-docker/docker-compose.yml)
+creates by default a new Docker network, `00-docker_default`, using the compose directory name.
+You can inspect the network with `docker network inspect 00-docker_default`.

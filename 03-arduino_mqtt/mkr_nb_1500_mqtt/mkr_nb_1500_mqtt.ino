@@ -1,6 +1,7 @@
 /**
 
-    XXX
+    This is the MKR NB 1500 MQTT sketch, configured
+    to work with the IoThon 2019 VMs.
 
     Required libraries:
       - MKRNB
