@@ -16,18 +16,19 @@
 // If you are not using the default PIN, consider using "arduino_secrets.h"
 // See https://www.hackster.io/Arduino_Genuino/store-your-sensitive-data-safely-when-sharing-a-sketch-e7d0f0
 const char PIN_NUMBER[] = "1234";
-const char APN[] = "internet";
+const char APN[] = "iot";
 
 #define MQTT_TOPIC_TEMPERATURE "home/iothon/temperature"
+#define MQTT_TOPIC_RSSI        "home/iothon/rssi"
 #define MQTT_TOPIC_STATE       "home/iothon/status"
 #define MQTT_PUBLISH_DELAY     60000 // 60 seconds
 #define MQTT_CLIENT_ID         "mkrnb1500iothon"
 
-const char *MQTT_SERVER   = "195.148.126.xx"; // XXX change to your server IP
+const char *MQTT_SERVER   = "10.200.1.1"; // XXX change to your server IP
 const char *MQTT_USER     = "mqttuser";     // NULL for no authentication
 const char *MQTT_PASSWORD = "mqttpassword"; // NULL for no authentication
 
-NB           nbAccess(true); // NB access: include a 'true' parameter for debug enabled
+NB           nbAccess(true); // NB access: use a 'true' parameter to enable debugging
 GPRS         gprsAccess;     // GPRS access
 NBClient     tcpSocket;
 PubSubClient mqttClient(tcpSocket);
@@ -39,7 +40,7 @@ void setup() {
 
   Serial.println("MKR NB 1500 MQTT client starting.");
 
-  Serial.print("Connecting to the NB-IoT / LTE Cat M1 network...");
+  Serial.print("Connecting to the NB-IoT / LTE Cat M1 network (may take several minutes)...");
   while (nbAccess.begin(PIN_NUMBER, APN) != NB_READY) {
     Serial.println("failed.  Retrying in 10 seconds.");
     delay(10000);
@@ -52,6 +53,10 @@ void setup() {
     delay(10000);
   }
   Serial.println("acquired.");
+#if 1 /* Using newer version of the library */
+  Serial.print("PDP Context: ");
+  Serial.println(nbAccess.readPDPparameters());
+#endif
 
   mqttClient.setServer(MQTT_SERVER, 1883);
 }
@@ -68,14 +73,16 @@ void loop() {
 
     float temperature = readTemperature();
     mqttPublish(MQTT_TOPIC_TEMPERATURE, temperature);
+    float rssi = readRSSI();
+    mqttPublish(MQTT_TOPIC_RSSI, rssi);
   }
+  delay(1000);
 }
 
 float readTemperature() {
   String temp;
 
-  // Read the NB-IoT modem's internal temperature
-
+  // Read the NB-IoT modem's internal temperature; does not work on all boards
   MODEM.send("AT+UTEMP?");
   MODEM.waitForResponse(100, &temp);
 
@@ -86,9 +93,24 @@ float readTemperature() {
   return NAN;
 }
 
+float readRSSI() {
+  String rssi;
+
+  MODEM.send("AT+CESQ");
+  MODEM.waitForResponse(100, &rssi);
+  Serial.print("RSSI=");
+  Serial.println(rssi);
+
+  if (rssi.startsWith("+CESQ: ")) {
+    rssi.remove(0, 7);
+    return rssi.toFloat();
+  }
+  return NAN;
+}
+
 void mqttConnectIfNeeded() {
   while (!mqttClient.connected()) {
-    Serial.print("Connceting to the MQTT...");
+    Serial.print("Connecting to the MQTT...");
 
     // Attempt to connect
     if (mqttClient.connect(MQTT_CLIENT_ID, MQTT_USER, MQTT_PASSWORD, MQTT_TOPIC_STATE, 1, true, "disconnected", false)) {
