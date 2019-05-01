@@ -172,7 +172,7 @@ data to your InfluxDB database.
 - Add data source (InfluxDB)
   - Name: `InfluxDB`
   - URL: `http://influxdb:8086`
-  - Database: `home_db`
+  - Database: `iothon_db`
   - User: `root`
   - Password: `root`
   - Save & Test
@@ -197,8 +197,8 @@ are more experienced, you can also
 [use GCC and a flasher directly](03-arduino_mqtt/Using-GCC.md).
 
 Sensors should send data to the mosquitto broker to the following MQTT topic:
-`home/{peripheralName}/{sensorname}`.
-For example: `home/mkrnb1500/temperature`.
+`iothon/{peripheralName}/{sensorname}`.
+For example: `iothon/mkrnb1500/temperature`.
 
 Arduino sketches for the MKR NB 1500 are provided to in `03-arduino_mqtt`.
 See the `README.md` [file there](03-arduino_mqtt/README.md).
@@ -234,7 +234,7 @@ MQTT bridge logs:
    docker logs mqttbridge
 ```
 
-To enter some data, Connect, and Publish, e.g. at `home/testing/temperature`.
+To enter some data, Connect, and Publish, e.g. at `iothon/testing/temperature`.
 
 ## Optional: Update mosquitto credentials
 
