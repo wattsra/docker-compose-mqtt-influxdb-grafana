@@ -79,6 +79,7 @@ def _send_sensor_data_to_influxdb(sensor_data):
 def _init_influxdb_database():
     databases = influxdb_client.get_list_database()
     if len(list(filter(lambda x: x['name'] == INFLUXDB_DATABASE, databases))) == 0:
+        print('Creating database ' + INFLUXDB_DATABASE)
         influxdb_client.create_database(INFLUXDB_DATABASE)
     influxdb_client.switch_database(INFLUXDB_DATABASE)
 
@@ -86,7 +87,7 @@ def _init_influxdb_database():
 def main():
     time.sleep(10)
 
-    print('Connecting to the database.')
+    print('Connecting to the database ' + INFLUXDB_DATABASE)
     _init_influxdb_database()
 
     mqtt_client = mqtt.Client(MQTT_CLIENT_ID)
