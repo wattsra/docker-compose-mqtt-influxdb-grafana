@@ -14,6 +14,15 @@ strength (RSSI) as measured by the NB-IoT modem on the MKR board.
 not report any temperature, and the RSSI is always `99`, which
 indicates an error value.
 
+## Known bugs and issues
+
+* The software stack does not (usually) recover from closing the MQTT socket.
+* Sometimes connecting to the NB-IoT network takes a long time (minutes).
+  * Apparently sometimes this may take a **very** long time, or indefinitely.
+* Reseting MKR NB 1500 with the reset button resets the USB connection.
+* A busy loop in your software may appear to brick the device.
+  * Pressing the reset button while trying to reprogram the device usually helps.
+
 ## Setup
 
 ### Installation
