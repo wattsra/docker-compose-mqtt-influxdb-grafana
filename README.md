@@ -14,6 +14,16 @@ The present repository has been adapted for the
 [IoThon 2019](https://iothon.io) hackathon,
 and is considerably different from Gautier Mechling's original one.
 
+For connecting your IoT device to the cloud, and then your front end,
+the overall network structure looks like the following:
+
+![5G connectivity](images/5G-connectivity.png)
+
+Your Arduino will be communicating over the 5G network with you server
+(denoteted as `User VM` in the figure), which runs some suitable software
+to communicate with the Arduino, to store any needed data, and to provide
+a user interface.
+
 The default instructions below explain how to install and test the presented
 approach using two computers:
 
@@ -54,13 +64,13 @@ The final subfolder is meant to be used in your *laptop*:
 
 ## Setup
 
-### Networking optoins
+### Networking options
 
 The networking between you server and your IoT device will be different
 depending on which kind of a SIM you are using.  The instructions below
 assume that you have a "normal" SIM, from a commercial vendor.  If you
 have an IoThon 2019 Aalto/COMNET SIM, please see the
-[Networking instructions](tunnelling/Networking.md)
+[Networking instructions](tunnelling/Networking.md).
 
 ### Cloning this repository to *both* your laptop and your server
 
