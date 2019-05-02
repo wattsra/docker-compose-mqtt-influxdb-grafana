@@ -54,6 +54,14 @@ The final subfolder is meant to be used in your *laptop*:
 
 ## Setup
 
+### Networking optoins
+
+The networking between you server and your IoT device will be different
+depending on which kind of a SIM you are using.  The instructions below
+assume that you have a "normal" SIM, from a commercial vendor.  If you
+have an IoThon 2019 Aalto/COMNET SIM, please see the
+[Networking instructions](tunnelling/Networking.md)
+
 ### Cloning this repository to *both* your laptop and your server
 
 For cloning this repository, you need
@@ -204,6 +212,11 @@ Arduino sketches for the MKR NB 1500 are provided to in `03-arduino_mqtt`.
 See the `README.md` [file there](03-arduino_mqtt/README.md).
 
 Before flashing, you need to change the `MQTT_SERVER` constant to MQTT *server* IP address.
+
+**NOTE!** If you are using an Aalto/COMNET SIM, the server IP address needs to be
+an inner private address, e.g. `10.200.1.100.`  If you are using a normal SIM from
+a commercial vendor, the server IP address needs to be its public IP address in
+the global network.
 
 For using any interesting sensors, you will need to modify the sketch to
 use a suitable sensor driver to fetch the data from the sensor and to pass
