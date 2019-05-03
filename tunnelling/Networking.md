@@ -19,15 +19,13 @@ Aalto/COMNET provisioned SIM, and things will be different.
 Conceptuall, the 5G core sits between a basestation, called eNB, and
 the Internet; see below for a figure.  By modifying the core you can
 freely set the traffic from each IoT device to be send anywhere,
-encapsulated or not.  Hence, if you
+encapsulated or not.
 
 A 5G core consists of a number of components, such as HSS, AMF, SMF,
 UPF, etc.  In the IoThon 2019 settings, these work in a single PC,
 called ePC, or a virtual machine.  Hopefully we will have them also
 isolated into dockers before the end of the hackathon, but at this
 writing we are not there yet.
-
-**TBD:** add here a figure depicting the connections
 
 ## Aalto/COMNET NB-IoT 5G provisioning
 
