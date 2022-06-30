@@ -7,10 +7,10 @@ services:
     ports:
       - 1883:1883
     volumes:
-      - ../01-mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
-      - ../01-mosquitto/users:/mosquitto/config/users
-      - ${DATA_DIR}/mosquitto/data:/mosquitto/data
-      - ${DATA_DIR}/mosquitto/log:/mosquitto/log
+      - /volume1/docker/mqtt/docker-compose-mqtt-influxdb-grafana/01-mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - /volume1/docker/mqtt/docker-compose-mqtt-influxdb-grafana/01-mosquitto/users:/mosquitto/config/users
+      - /volume1/docker/mqtt/mosquitto/data:/mosquitto/data
+      - /volume1/docker/mqtt/mosquitto/log:/mosquitto/log
     restart: always
 
   influxdb:
@@ -19,7 +19,7 @@ services:
     ports:
       - 8086:8086
     volumes:
-      - ${DATA_DIR}/influxdb:/var/lib/influxdb
+      - /volume1/docker/mqtt/influxdb:/var/lib/influxdb
     restart: always
 
   grafana:
@@ -30,11 +30,11 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - ${DATA_DIR}/grafana:/var/lib/grafana
+      - /volume1/docker/mqtt/grafana:/var/lib/grafana
     restart: always
 
   mqttbridge:
-    build: ../02-bridge
+    # build: ../02-bridge
     image: iothon/mqttbridge
     container_name: mqttbridge
     depends_on:
